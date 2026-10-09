@@ -116,6 +116,8 @@ Se desarrolla el script llamado monitor_task.sql e inclusive se adjunta las sigu
 
 ## Evidencias
 
+En la carpeta de evidencias de este repositorio se agregan unos links de los videos que evidencian la ejecución exitosa de la prueba.
+
 <img width="921" height="534" alt="image" src="https://github.com/user-attachments/assets/f53542c3-12c2-4a43-a3fc-d8b3edba4cf1" />
 
 <img width="921" height="365" alt="image" src="https://github.com/user-attachments/assets/4eeb1660-0f91-48dc-b3a3-e3d7e7992427" />
