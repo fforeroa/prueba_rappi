@@ -97,7 +97,7 @@ Se realiza una prueba con la siguiente evidencia:
 
 ## Exportación de tablas procesadas en S3.
 
-En la cuenta gratuita de AWS se crea un bicket llamado  **meetup-processed-fforero** , y se genera un  key_id y una clave secreta , indispensables para el paso que sigue.
+En la cuenta gratuita de AWS se crea un bucket llamado  **meetup-processed-fforero** , y se genera un  key_id y una clave secreta , indispensables para el paso que sigue.
 
 Despues de esto en Snowflake se ejecutan unos pasos en el **script cargar_s3.sql** donde se exportan las tablas procesadas primero se crea un stage llamado MEETUP_DB.PROCESSED.AWS_S3_FINAL_STAGE donde se configurará el bucket , la key_id y la clave secreta.
 Despues se exportan los tres archivos a a S3 por medio de un COPY INTO CON EL formato creado en RAW llamado **csv_meetup_format**.
