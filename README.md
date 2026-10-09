@@ -48,6 +48,7 @@ Entrar a la carpeta llamada dags/ que se generó dentro del proyecto.
 
 Se crea un archivo nuevo de Python llamado **meetup_dag.py** donde se usa MERGE cada 15 minutos y las  alertas para los procesos y que se muestren en Slack usando Airflow .El DAG se llamará automation_meetup_snowflake.
 Para simular de manera realista que llegan "nuevos datos" cada 15 minutos en un entorno estático, utilizaremos una estrategia de ingeniería avanzada, donde se crearán los siguientes objetos:
+
 Esquema: 
 MEETUP_DB.PROCESSED
 Tablas:
