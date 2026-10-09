@@ -43,7 +43,7 @@ with DAG(
         sql="""
         CREATE SCHEMA IF NOT EXISTS MEETUP_DB.PROCESSED;
         
-        -- 1. Crear la tabla de dimensión enriquecida en el esquema analítico
+        -- 1. Crear la tabla de dimensión enriquecida en el esquema analítico DIM_GROUPS
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.DIM_GROUPS (
             group_id INT PRIMARY KEY,
             group_name VARCHAR(255),
@@ -56,7 +56,7 @@ with DAG(
             processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
         );
 
-        -- 2. Proceso ELT Creativo Avanzado para tu DAG (Simulando actualizaciones incrementales)
+        -- 2. Proceso ELT Creativo Avanzado para tu DAG (Simulando actualizaciones incrementales) DIM_GROUPS
         CREATE OR REPLACE TEMPORARY TABLE MEETUP_DB.PROCESSED.STG_GROUPS_BATCH AS
         SELECT * FROM 
         (SELECT 
@@ -88,7 +88,7 @@ with DAG(
             VALUES (source.group_id, source.group_name, source.category_name, source.city_name, source.country_code, source.total_members, source.group_rating, source.organizer_name);
 
 
-         -- 1. Asegurar que la tabla definitiva exista
+         -- 1. Asegurar que la tabla definitiva exista DIM_MEMBERS
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.DIM_MEMBERS (
             member_id     INT PRIMARY KEY,
             member_name   VARCHAR(255),
@@ -100,7 +100,7 @@ with DAG(
             processed_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
         );
 
-        -- 2. CORREGIDO: Eliminar duplicados en el origen usando QUALIFY antes del SAMPLE
+      
         CREATE OR REPLACE TEMPORARY TABLE MEETUP_DB.PROCESSED.STG_MEMBERS_BATCH AS
         SELECT * FROM (
             SELECT 
@@ -132,7 +132,7 @@ with DAG(
             VALUES (source.member_id, source.member_name, source.city, source.country, source.member_status, source.joined_date, source.has_bio);
 
 
-        
+        -- Tabla de eventos
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.EVENTS_ANALYTICS (
         event_id                     VARCHAR(50) PRIMARY KEY,
         event_name                   VARCHAR(255),
@@ -142,7 +142,7 @@ with DAG(
         venue_name                   VARCHAR(255),          
         venue_city                   VARCHAR(150),
         venue_state                  VARCHAR(255),
-        fee_amount                   NUMBER(10,2), -- Aumentado a 10 para mayor seguridad con montos largos  
+        fee_amount                   NUMBER(10,2),
         maybe_rsvp_count             INT, 
         duration_minutes             INT,
         estimated_potential_revenue  NUMBER(10,2),
@@ -218,7 +218,7 @@ with DAG(
             source.is_premium_event, source.rsvp_occupancy_rate
         );
         
-        -- 1. Crear la tabla de hechos unificada en PROCESSED
+        -- 1. Crear la tabla de hechos unificada FACT_MEMBERSHIP_ENGAGEMENT
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.FACT_MEMBERSHIP_ENGAGEMENT (
             member_id           INT,
             group_id            INT,
@@ -231,7 +231,7 @@ with DAG(
             PRIMARY KEY (member_id, group_id)
         );
 
-        -- 2. Carga por lotes con eliminación de duplicados para tu DAG
+        -- 2. Carga por lotes con eliminación de duplicados FACT_MEMBERSHIP_ENGAGEMENT
         CREATE OR REPLACE TEMPORARY TABLE MEETUP_DB.PROCESSED.STG_FACT_MEMBERSHIP AS
         SELECT * FROM (
             SELECT 
@@ -249,7 +249,7 @@ with DAG(
         ) sub
         SAMPLE (10);
 
-        -- 3. Ingesta Incremental mediante MERGE
+        -- 3. Ingesta Incremental mediante MERGE FACT_MEMBERSHIP_ENGAGEMENT
         MERGE INTO MEETUP_DB.PROCESSED.FACT_MEMBERSHIP_ENGAGEMENT target
         USING MEETUP_DB.PROCESSED.STG_FACT_MEMBERSHIP source
         ON target.member_id = source.member_id AND target.group_id = source.group_id
@@ -264,7 +264,7 @@ with DAG(
             INSERT (member_id, group_id, member_name, group_name, city_name, days_since_joined, is_active_member)
             VALUES (source.member_id, source.group_id, source.member_name, source.group_name, source.city_name, source.days_since_joined, source.is_active_member);
 
-       -- 1. Crear la tabla puente analítica
+       -- 1. Crear la tabla puente analítica DIM_TOPICS_BRIDGE
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.DIM_TOPICS_BRIDGE (
             group_id       INT,
             topic_id       INT,
@@ -275,7 +275,7 @@ with DAG(
             PRIMARY KEY (group_id, topic_id)
         );
 
-        -- 2. Query de transformación para tu DAG
+        -- 2. Query de transformación DIM_TOPICS_BRIDGE
         CREATE OR REPLACE TEMPORARY TABLE MEETUP_DB.PROCESSED.STG_TOPICS_BRIDGE AS
         SELECT * FROM (
             SELECT 
@@ -291,7 +291,7 @@ with DAG(
         ) sub
         SAMPLE (20);
 
-        -- 3. Merge de Consolidación
+        -- 3. Merge de Consolidación DIM_TOPICS_BRIDGE
         MERGE INTO MEETUP_DB.PROCESSED.DIM_TOPICS_BRIDGE target
         USING MEETUP_DB.PROCESSED.STG_TOPICS_BRIDGE source
         ON target.group_id = source.group_id AND target.topic_id = source.topic_id
@@ -300,11 +300,10 @@ with DAG(
         WHEN NOT MATCHED THEN
             INSERT (group_id, topic_id, group_name, topic_name, category_name)
             VALUES (source.group_id, source.topic_id, source.group_name, source.topic_name, source.category_name);
-      
-              -- 1. Crear la tabla puente analítica
+         
        
         
-        -- 1. Tabla agregada final
+        -- 1. Tabla agregada final AGG_VENUE_GEOMARKETING
         CREATE TABLE IF NOT EXISTS MEETUP_DB.PROCESSED.AGG_VENUE_GEOMARKETING (
             venue_id           INT PRIMARY KEY,
             venue_name         VARCHAR(255),
@@ -331,7 +330,7 @@ with DAG(
         WHERE v.venue_id IS NOT NULL
         GROUP BY v.venue_id, v.venue_name, v.city, v.state;
 
-        -- 3. Sincronización analítica
+        -- 3. Sincronización analítica AGG_VENUE_GEOMARKETING
         MERGE INTO MEETUP_DB.PROCESSED.AGG_VENUE_GEOMARKETING target
         USING MEETUP_DB.PROCESSED.STG_VENUE_AGG source
         ON target.venue_id = source.venue_id
@@ -344,7 +343,8 @@ with DAG(
         WHEN NOT MATCHED THEN
             INSERT (venue_id, venue_name, city_name, state_code, total_events_held, avg_venue_rating, total_rsvps_hosted)
             VALUES (source.venue_id, source.venue_name, source.city_name, source.state_code, source.total_events_held, source.avg_venue_rating, source.total_rsvps_hosted);
-       
+
+      -- Exportación automática a S3 DIM_TOPICS_BRIDGE
        COPY INTO @MEETUP_DB.PROCESSED.AWS_S3_FINAL_STAGE/pipeline_output_dim_brigde
        FROM MEETUP_DB.PROCESSED.DIM_TOPICS_BRIDGE 
        FILE_FORMAT = (FORMAT_NAME = 'MEETUP_DB.RAW.csv_meetup_format')
