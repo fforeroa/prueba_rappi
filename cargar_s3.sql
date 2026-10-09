@@ -1,7 +1,7 @@
 USE DATABASE MEETUP_DB;
 USE SCHEMA PROCESSED;
 
--- 1. Crear la conexión directa y segura hacia tu bucket de Ohio usando tus llaves
+-- 1. Crear la conexión directa y segura hacia tu bucket usando tus llaves
 CREATE OR REPLACE STAGE MEETUP_DB.PROCESSED.AWS_S3_FINAL_STAGE
   URL = 's3://meetup-processed-fforero/'
   CREDENTIALS = (
@@ -9,7 +9,7 @@ CREATE OR REPLACE STAGE MEETUP_DB.PROCESSED.AWS_S3_FINAL_STAGE
     AWS_SECRET_KEY = 'xxxxxxxxxxxxxxxxxxxxxx'
   );
 
--- 2. ¡Comando maestro de exportación! Transfiere la tabla procesada por Airflow a tu AWS S3
+-- 2. Transfiere la tabla procesada por Airflow a tu AWS S3
 COPY INTO @MEETUP_DB.PROCESSED.AWS_S3_FINAL_STAGE/pipeline_output_events
 FROM MEETUP_DB.PROCESSED.EVENTS_ANALYTICS
 FILE_FORMAT = (FORMAT_NAME = 'MEETUP_DB.RAW.csv_meetup_format')
