@@ -69,14 +69,23 @@ Las tablas se poblarán de manera incremental cada 15 minutos con muestras del 1
 Después de crear el archivo .py se enciende Airflow con el siguiente comando , ejecutado en la terminal. 
 astro dev start
 Despues de esto se crea la conexión de snowflake en Admin->  Connections con los siguientes parámetros:
+
 o	Nombre conexión: snowflake_default
+
 o	Conn Type: Snowflake
+
 o	Login: FFOREROA
+
 o	Password: XXXXXX
+
 o	Account: pabyqwc-zq79803
+
 o	Warehouse: COMPUTE_WH
+
 o	Database: MEETUP_DB
+
 o	Schema: RAW
+
 En el DAG, automation_meetup_snowflake se hace  clic en el botón de "Play" a la derecha para ejecutar tu primera prueba de automatización en caliente.
 
 <img width="921" height="490" alt="image" src="https://github.com/user-attachments/assets/59a1f406-112a-4765-add4-08621df72405" />
