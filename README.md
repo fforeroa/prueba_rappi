@@ -3,16 +3,16 @@ Prueba técnica RappiPay
 
 ## Sets de datos
 En este prueba se entregan nueve set de datos a través de la página https://www.kaggle.com/megelon/meetup :
-Cities.csv
-Categories.csv
-Events.csv
-Groups.csv
-Groups_topics.csv
-Members.csv
-Members_topics.csv
-Topics.csv
-Venues.csv
-Descarga de archivos
+- Cities.csv
+- Categories.csv
+- Events.csv
+- Groups.csv
+- Groups_topics.csv
+- Members.csv
+- Members_topics.csv
+- Topics.csv
+- Venues.csv
+
 Unos de los primeros pasos es crear el catalogo MEETUP_DB y el esquema RAW a través del script crear_db_raw_scheme.sql
 Se creo un stage interno llamado meetup_stage evidenciado en el mismo script **crear_db_raw_scheme.sql** .
 
